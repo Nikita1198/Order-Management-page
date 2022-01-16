@@ -1,0 +1,8 @@
+<!-- Component used on the Quick Action -->
+<aura:component implements="force:lightningQuickAction, force:hasRecordId" >
+    <lightning:navigation aura:id="navService"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler name="init" action="{!c.navigateToLC}" value="{!this}" />
+
+</aura:component>
