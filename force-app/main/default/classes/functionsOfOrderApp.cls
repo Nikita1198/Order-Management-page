@@ -21,4 +21,47 @@ public with sharing class functionsOfOrderApp {
         }
         return obj;
     }
+
+    @AuraEnabled(Cacheable=true)
+    public static Product_c__c[] getAllProduct() {
+        return [
+            SELECT
+                Id,
+                Name, 
+                Image__c, 
+                Type__c,
+                Family__c,
+                Description__c,
+                Price__c
+            FROM Product_c__c
+            ORDER BY Name
+            LIMIT 50
+        ];
+    }
+
+    @AuraEnabled(Cacheable=true)
+    public static Product_c__c[] searchProduct(String searchTerm) {
+        // Return all bears when no search term
+        searchTerm = searchTerm.trim();
+        if (searchTerm == '') {
+            return getAllProduct();
+        }
+        // Prepare query paramters
+        searchTerm = '%' + searchTerm + '%';
+        // Execute search query
+        return [
+            SELECT
+                Id,
+                Name, 
+                Image__c, 
+                Type__c,
+                Family__c,
+                Description__c,
+                Price__c
+            FROM Product_c__c
+            WHERE Name LIKE :searchTerm
+            ORDER BY Name
+            LIMIT 50
+        ];
+    }
 }

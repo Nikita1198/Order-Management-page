@@ -23,6 +23,7 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import PRODUCT_OBJECT from '@salesforce/schema/Product_c__c';
 
+import searchProduct from '@salesforce/apex/functionsOfOrderApp.searchProduct';
 
 
 export default class orderManagementComponent extends LightningElement {
@@ -112,6 +113,31 @@ export default class orderManagementComponent extends LightningElement {
         }
     )
     leadSourceValuesFamily;
+
+
+    // List of records with search
+
+    @track searchTerm = '';
+    @wire(searchProduct, {searchTerm: '$searchTerm'})
+	products;
+
+
+    handleSearchTermChange(event) {
+		// Debouncing this method: do not update the reactive property as
+		// long as this function is being called within a delay of 300 ms.
+		// This is to avoid a very large number of Apex method calls.
+		window.clearTimeout(this.delayTimeout);
+		const searchTerm = event.target.value;
+		// eslint-disable-next-line @lwc/lwc/no-async-operation
+		this.delayTimeout = setTimeout(() => {
+			this.searchTerm = searchTerm;
+		}, 300);
+	}
+
+    get hasResults() {
+		return (this.products.data.length > 0);
+	}
+
 
     /*
     @track prodRecord = {

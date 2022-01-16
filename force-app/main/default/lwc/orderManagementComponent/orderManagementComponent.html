@@ -117,31 +117,37 @@
                 </div>
                 <div class="slds-col slds-m-around_x-small " style='padding-top:8px !important'>
                     <div  class="slds-grid slds-gutters slds-p-around_small slds-p-top_none"  >
-                        <div class="slds-col slds-box slds-m-right_medium slds-m-right_none slds-theme_default " >
+                        <div class="slds-col slds-box slds-m-right_medium slds-m-right_none slds-theme_default " style="height: 200px">
                             Filter
                         </div>
-                        <div class="slds-col  slds-box slds-m-left_medium slds-theme_default" style="width:auto">
-                            <div class="slds-grid slds-wrap">
-                                <div class="slds-col slds-size_10-of-12 slds-box">
+                        <lightning-card class="slds-col  slds-p-right_none" style="width:700px">
+                            <div class="slds-card__body_inner">
+                                <!-- Start bear list -->
+                                <template if:true={products.data}>
                                     <lightning-input type="search"
                                         onchange={handleSearchTermChange}
                                         variant="label-hidden"
-                                        class="slds-m-around_x-small"
                                         label="Search"
-                                        placeholder="Search"
+                                        placeholder="Search for products"
                                         value={searchTerm}>
                                     </lightning-input>
-                                </div>
-                                <div class="slds-col slds-grid slds-size_1-of-2">
-                                    <div class="slds-col slds-size_1-of-2 slds-box">
-                                        <span>cards</span>
-                                    </div>
-                                    <div class="slds-col slds-size_1-of-2 slds-box">
-                                        <span>cards</span>
-                                    </div>
-                                </div>
+                                    <lightning-layout multiple-rows="true" pull-to-boundary="small">
+                                        <template for:each={products.data} for:item="product">
+                                            <lightning-layout-item key={product.Id} size="3" padding="around-small" >
+                                                <c-product-tile product={product} ></c-product-tile>
+                                            </lightning-layout-item>
+                                        </template>
+                                    </lightning-layout>
+                                    <!-- No bears found -->
+                                    <template if:false={hasResults}>
+                                        <div class="slds-align_absolute-center slds-var-m-vertical_small">
+                                            This is beary disturbing, we did not find results...
+                                        </div>
+                                    </template>
+                                </template>
+                                <!-- End bear list -->
                             </div>
-                        </div>
+                        </lightning-card>
                     </div>
                 </div>
             </div>
