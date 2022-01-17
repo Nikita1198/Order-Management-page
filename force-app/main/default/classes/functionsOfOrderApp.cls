@@ -35,21 +35,39 @@ public with sharing class functionsOfOrderApp {
                 Price__c
             FROM Product_c__c
             ORDER BY Name
-            LIMIT 50
         ];
     }
 
     @AuraEnabled(Cacheable=true)
-    public static Product_c__c[] searchProduct(String searchTerm) {
-        // Return all bears when no search term
+    public static Product_c__c[] searchProduct(String searchTerm, String typeTerm, String familyTerm) {
+        
         searchTerm = searchTerm.trim();
-        if (searchTerm == '') {
+
+         // Prepare query paramters
+         searchTerm = '%' + searchTerm + '%';
+         // Execute search query
+
+        List<Product_c__c> prod = new List<Product_c__c>();
+
+        if (searchTerm == '' && typeTerm == '' && familyTerm == '') {
             return getAllProduct();
-        }
-        // Prepare query paramters
-        searchTerm = '%' + searchTerm + '%';
-        // Execute search query
-        return [
+        }else if (typeTerm == '' && familyTerm == '') {
+            prod = [
+                SELECT
+                    Id,
+                    Name, 
+                    Image__c, 
+                    Type__c,
+                    Family__c,
+                    Description__c,
+                    Price__c
+                FROM Product_c__c
+                WHERE Name LIKE :searchTerm 
+                ORDER BY Name
+                LIMIT 50
+            ];
+        } else if (searchTerm != '' && typeTerm == '' ) {
+            prod = [
             SELECT
                 Id,
                 Name, 
@@ -59,10 +77,46 @@ public with sharing class functionsOfOrderApp {
                 Description__c,
                 Price__c
             FROM Product_c__c
-            WHERE Name LIKE :searchTerm
+            WHERE Family__c = :familyTerm
+            AND Name LIKE :searchTerm
             ORDER BY Name
             LIMIT 50
         ];
+        } else if (searchTerm != '' && familyTerm == '' ) {
+            prod = [
+            SELECT
+                Id,
+                Name, 
+                Image__c, 
+                Type__c,
+                Family__c,
+                Description__c,
+                Price__c
+            FROM Product_c__c
+            WHERE Type__c = :typeTerm
+            AND Name LIKE :searchTerm
+            ORDER BY Name
+            LIMIT 50
+        ];
+        } else if (searchTerm != '' && typeTerm != '' && familyTerm != '') {
+            prod =  [
+            SELECT
+                Id,
+                Name, 
+                Image__c, 
+                Type__c,
+                Family__c,
+                Description__c,
+                Price__c
+            FROM Product_c__c
+            WHERE Name LIKE :searchTerm 
+            AND Family__c LIKE :familyTerm
+            AND Type__c LIKE :typeTerm
+            ORDER BY Name
+            LIMIT 50
+        ];
+        }
+        return prod;
     }
 
 }

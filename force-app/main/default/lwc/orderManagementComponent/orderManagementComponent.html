@@ -99,10 +99,14 @@
                                                 </lightning-icon></h2>
                                             </header>
                                             <!-- Modal/Popup Box LWC body starts here -->
-                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
-                                                <div class="slds-m-around--xx-large">
-                                                    
-                                                </div>
+                                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                                                <lightning-datatable
+                                                        key-field="id"
+                                                        data={listInCart}
+                                                        columns={columns}
+                                                        hide-checkbox-column 
+                                                        show-row-number-column>
+                                                </lightning-datatable> 
                                             </div> 
                                             <!-- Modal/Popup Box LWC footer starts here -->
                                             <footer class="slds-modal__footer">
@@ -120,9 +124,24 @@
                 <div class="slds-col slds-m-around_x-small " style='padding-top:8px !important'>
                     <div  class="slds-grid slds-gutters slds-p-around_small slds-p-top_none"  >
                         <div class="slds-col slds-box slds-m-right_medium slds-m-right_none slds-theme_default " style="height: 200px">
-                            Filter
+                            <h2>Filters</h2><br>
+                            <lightning-combobox
+                                name="family"
+                                label="Family"
+                                value={filterTermFamily}
+                                options={familyForPicklist}
+                                onchange={handleFilterTermFamilyChange}
+                                ></lightning-combobox> 
+                                <br>
+                            <lightning-combobox
+                                name="type"
+                                label="Type"
+                                value={filterTermType}
+                                options={typeForPicklist}
+                                onchange={handleFilterTermTypeChange}
+                                ></lightning-combobox>
                         </div>
-                        <lightning-card class="slds-col  slds-p-right_none" style="width:700px">
+                        <lightning-card class="slds-col  slds-p-right_none" style="width:800px">
                             <div class="slds-card__body_inner">
                                 <!-- Start bear list -->
                                 <template if:true={products.data}>
@@ -135,15 +154,15 @@
                                     </lightning-input>
                                     <lightning-layout multiple-rows="true" pull-to-boundary="small">
                                         <template for:each={products.data} for:item="product">
-                                            <lightning-layout-item key={product.Id} size="3" padding="around-small" >
-                                                <c-product-tile product={product} ></c-product-tile>
+                                            <lightning-layout-item key={product.Id} size="6" padding="around-small" >
+                                                <c-product-tile key={product.Id} product={product} onselected={productSelected}></c-product-tile>
                                             </lightning-layout-item>
                                         </template>
                                     </lightning-layout>
                                     <!-- No bears found -->
                                     <template if:false={hasResults}>
                                         <div class="slds-align_absolute-center slds-var-m-vertical_small">
-                                            This is beary disturbing, we did not find results...
+                                            Didn't find a comparable result
                                         </div>
                                     </template>
                                 </template>

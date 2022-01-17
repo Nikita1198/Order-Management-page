@@ -29,6 +29,7 @@ import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import PRODUCT_OBJECT from '@salesforce/schema/Product_c__c';
 
 import searchProduct from '@salesforce/apex/functionsOfOrderApp.searchProduct';
+import getAllProduct from '@salesforce/apex/functionsOfOrderApp.getAllProduct';
 
 
 export default class orderManagementComponent extends LightningElement {
@@ -71,7 +72,6 @@ export default class orderManagementComponent extends LightningElement {
 
 
     // Product__c creation
-
     // this object have record information
 
     @track name = NAME_FIELD;
@@ -82,7 +82,7 @@ export default class orderManagementComponent extends LightningElement {
     @track family = FAMILY_FIELD;
 
     myFields = [NAME_FIELD,DESCRIPTION_FIELD,IMAGE_FIELD,PRICE_FIELD,TYPE_FIELD,FAMILY_FIELD];
-    productObject = PRODUCT_OBJECT;
+    @api productObject = PRODUCT_OBJECT;
 
     handleSuccess() {
         this.dispatchEvent(
@@ -92,6 +92,7 @@ export default class orderManagementComponent extends LightningElement {
                 variant: 'success',
             }),
         );
+        this.searchTerm ='';
         this.isModalOpen = false;
     }
 
@@ -120,20 +121,44 @@ export default class orderManagementComponent extends LightningElement {
     leadSourceValuesFamily;
 
 
-    // List of records with search
+    // List of records with search/filters
 
     @track searchTerm = '';
-    @wire(searchProduct, {searchTerm: '$searchTerm'})
+
+    @track filterTermType = '';
+    @track filterTermFamily ='';
+
+    familyForPicklist = [
+        {label: "None", value: ""},
+        {label: "Family 1", value: "Family 1"},
+        {label: "Family 2", value: "Family 2"},
+        {label: "Family 3", value: "Family 3"}
+    ];
+
+    typeForPicklist = [
+        {label: "None", value: ""},
+        {label: "Type 1", value: "Type 1"},
+        {label: "Type 2", value: "Type 2"},
+        {label: "Type 3", value: "Type 3"}
+    ];
+
+    @wire(searchProduct, {searchTerm: '$searchTerm',
+                          typeTerm: '$filterTermType',
+                          familyTerm: '$filterTermFamily' })
 	products;
 
+    handleFilterTermTypeChange(event) {
+		this.filterTermType = event.target.value;
+	}
+
+    handleFilterTermFamilyChange(event) {
+		this.filterTermFamily = event.target.value;
+	}
 
     handleSearchTermChange(event) {
-		// Debouncing this method: do not update the reactive property as
-		// long as this function is being called within a delay of 300 ms.
-		// This is to avoid a very large number of Apex method calls.
 		window.clearTimeout(this.delayTimeout);
 		const searchTerm = event.target.value;
-		// eslint-disable-next-line @lwc/lwc/no-async-operation
+
 		this.delayTimeout = setTimeout(() => {
 			this.searchTerm = searchTerm;
 		}, 300);
@@ -147,8 +172,7 @@ export default class orderManagementComponent extends LightningElement {
     // track button Create Product 
     @track check;
     @track isManager;
-    ShowBtn = false;
-
+    ShowBtn = true;
     @wire(getRecord, {
         recordId: USER_ID,
         fields: [ISMANAGER_FIELD]
@@ -165,6 +189,57 @@ export default class orderManagementComponent extends LightningElement {
             };
         }
     }
+
+
+    // Add to cart items
+
+    @track selectedProduct;
+
+    @wire(getAllProduct) productList;
+
+    productSelected(event) {
+        try {
+            const productId = event.detail;
+            console.log(productId);
+            this.selectedProduct = this.productList.data.find(product => product.Id === productId);
+            console.log(this.selectedProduct);
+            this.listInCart.push(this.selectedProduct)
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: this.selectedProduct.Name +' added to cart!',
+                    variant: 'success',
+                }),
+            );
+        } catch(error) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error adding product',
+                    message: error.body.message,
+                    variant: 'error'
+                })
+          );
+        }
+        
+    }
+
+    get listIsNotEmpty() {
+        return this.productList && Array.isArray(this.productList.data) && this.productList.data.length > 0;
+    }
+
+    // List of products in Cart 
+
+    @track listInCart = [];
+    
+    @track columns = [
+        {label: 'Name', fieldName: 'Name'},
+        {label: 'Type', fieldName: 'Type__c'},
+        {label: 'Family', fieldName: 'Family__c'},
+        {label: 'Price', fieldName: 'Price__c'},
+    ];
+
+
+
     /*
     @track prodRecord = {
         NAME_FIELD : this.name,

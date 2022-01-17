@@ -7,7 +7,7 @@
         </h3>
         <div slot="footer">
             <button class="slds-button slds-button_neutral slds-m-left_xxx-small slds-m-right_xx-small" onclick={openCartModal}>Details</button>
-            <button class="slds-button slds-button_neutral slds-m-left_xx-small" onclick={openCartModal}>Add</button>
+            <button class="slds-button slds-button_neutral slds-m-left_xx-small" onclick={selectHandler}>Add</button>
         </div>
         <p class="slds-p-horizontal_small">{product.Description__c}</p>
 	</lightning-card>
@@ -45,11 +45,11 @@
                                             </lightning-output-field>
                                         </div>
                                         <div class="slds-col slds-size_1-of-2">
-                                            <lightning-output-field field-name="Image__c">
-                                            </lightning-output-field>
                                             <lightning-output-field field-name="Description__c">
                                             </lightning-output-field>
                                             <lightning-output-field field-name="Family__c">
+                                            </lightning-output-field>
+                                            <lightning-output-field field-name="Image__c">
                                             </lightning-output-field>
                                         </div>
                                     </div>
