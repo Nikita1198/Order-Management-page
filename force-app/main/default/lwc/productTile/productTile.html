@@ -1,16 +1,18 @@
 <!-- sldsValidatorIgnore -->
 <template>
-	<lightning-card title={product.Name} class="product-tile">
-		<div class="slds-var-p-horizontal_small product-tile-body">
-			<div class="slds-media">
-				<div class="slds-media__body">
-					<p class="slds-var-m-bottom_xx-small">{product.Description__c}</p>
-				</div>
-			</div>
-            <div class='slds-m-top_medium slds-m-bottom_small '>
-                <button class="slds-button slds-m-left_xx-small slds-m-right_small" onclick={openCartModal}>Details</button>
-                <button class="slds-button slds-m-left_xx-small" onclick={openCartModal}>Add</button>
-            </div>
+	<lightning-card class="product-tile" >
+        <h3 slot="title">
+            <lightning-icon class='slds-m-right_x-small' icon-name="standard:product_item" size="small"></lightning-icon>
+            {product.Name}
+        </h3>
+        <div slot="footer">
+            <button class="slds-button slds-button_neutral slds-m-left_xxx-small slds-m-right_xx-small" onclick={openCartModal}>Details</button>
+            <button class="slds-button slds-button_neutral slds-m-left_xx-small" onclick={openCartModal}>Add</button>
+        </div>
+        <p class="slds-p-horizontal_small">{product.Description__c}</p>
+	</lightning-card>
+
+
             <!--  start of Modal Cart-->
             <template if:true={isCartModal}>
                 <!-- Modal/Popup Box LWC starts here -->
@@ -57,12 +59,10 @@
                             <footer class="slds-modal__footer">
                                 <button class="slds-button slds-button_neutral" onclick={closeCartModal} title="Close">Close</button>
                             </footer>
-                            
                     </div>
                 </section>
                 <div class="slds-backdrop slds-backdrop_open"></div>
             </template>
             <!--  end of modal-->
-		</div>
-	</lightning-card>
+	
 </template>

@@ -1,6 +1,11 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import getAccountData from '@salesforce/apex/functionsOfOrderApp.getAccountData';
 
+// User information about IsManager
+import USER_ID from '@salesforce/user/Id';
+import ISMANAGER_FIELD from '@salesforce/schema/User.IsManager__c';
+import { getRecord } from 'lightning/uiRecordApi';
+
 // Importing Apex Class method
 import saveProductRecord from '@salesforce/apex/functionsOfOrderApp.saveProductRecord';
 
@@ -139,6 +144,27 @@ export default class orderManagementComponent extends LightningElement {
 	}
 
 
+    // track button Create Product 
+    @track check;
+    @track isManager;
+    ShowBtn = false;
+
+    @wire(getRecord, {
+        recordId: USER_ID,
+        fields: [ISMANAGER_FIELD]
+    }) wireuser({
+        error,
+        check
+    }) {
+        if (error) {
+           this.error = error ; 
+        } else if (check) {
+            this.isManager = data.fields.IsManager__c.value
+            if( this.isManager == true){
+                this.ShowBtn = true;
+            };
+        }
+    }
     /*
     @track prodRecord = {
         NAME_FIELD : this.name,
