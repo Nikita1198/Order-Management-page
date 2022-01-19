@@ -1,13 +1,17 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import getAccountData from '@salesforce/apex/functionsOfOrderApp.getAccountData';
+
+// Navigation
+import { NavigationMixin } from 'lightning/navigation';
 
 // User information about IsManager
-import USER_ID from '@salesforce/user/Id';
-import ISMANAGER_FIELD from '@salesforce/schema/User.IsManager__c';
-import { getRecord } from 'lightning/uiRecordApi';
+import Id from '@salesforce/user/Id';
 
 // Importing Apex Class method
-import saveProductRecord from '@salesforce/apex/functionsOfOrderApp.saveProductRecord';
+import setOrderList from '@salesforce/apex/functionsOfOrderApp.setOrderList';
+import getUserDetails from '@salesforce/apex/functionsOfOrderApp.getUserDetails';
+import searchProduct from '@salesforce/apex/functionsOfOrderApp.searchProduct';
+import getAllProduct from '@salesforce/apex/functionsOfOrderApp.getAllProduct';
+import getAccountData from '@salesforce/apex/functionsOfOrderApp.getAccountData';
 
 // importing to show toast notifictions
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
@@ -28,11 +32,8 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import PRODUCT_OBJECT from '@salesforce/schema/Product_c__c';
 
-import searchProduct from '@salesforce/apex/functionsOfOrderApp.searchProduct';
-import getAllProduct from '@salesforce/apex/functionsOfOrderApp.getAllProduct';
 
-
-export default class orderManagementComponent extends LightningElement {
+export default class orderManagementComponent extends NavigationMixin(LightningElement) {
 
     @api recordId;
     @track accounts;
@@ -53,11 +54,9 @@ export default class orderManagementComponent extends LightningElement {
     // Modal for Create Product
     @track isModalOpen = false;
     openModal() {
-        // to open modal set isModalOpen tarck value as true
         this.isModalOpen = true;
     }
     closeModal() {
-        // to close modal set isModalOpen tarck value as false
         this.isModalOpen = false;
     }
 
@@ -72,8 +71,7 @@ export default class orderManagementComponent extends LightningElement {
 
 
     // Product__c creation
-    // this object have record information
-
+    // this object has record information
     @track name = NAME_FIELD;
     @track description = DESCRIPTION_FIELD;
     @track image = IMAGE_FIELD;
@@ -98,7 +96,6 @@ export default class orderManagementComponent extends LightningElement {
 
     // For PickList
     // Type__c
-
     @wire(getObjectInfo, { objectApiName: PRODUCT_OBJECT })
     productInfo;
 
@@ -111,7 +108,6 @@ export default class orderManagementComponent extends LightningElement {
     leadSourceValues;
 
     // Family__c
-
     @wire(getPicklistValues,
         {
             recordTypeId: '$productInfo.data.defaultRecordTypeId',
@@ -122,7 +118,6 @@ export default class orderManagementComponent extends LightningElement {
 
 
     // List of records with search/filters
-
     @track searchTerm = '';
 
     @track filterTermType = '';
@@ -169,30 +164,33 @@ export default class orderManagementComponent extends LightningElement {
 	}
 
 
-    // track button Create Product 
-    @track check;
-    @track isManager;
-    ShowBtn = true;
-    @wire(getRecord, {
-        recordId: USER_ID,
-        fields: [ISMANAGER_FIELD]
-    }) wireuser({
+    // Track button Create Product 
+    @track ShowBtn = false;
+    userId = Id;
+    @track user;
+
+    @wire(getUserDetails, {
+        recId: '$userId'
+    })
+    wiredUser({
         error,
-        check
+        data
     }) {
-        if (error) {
-           this.error = error ; 
-        } else if (check) {
-            this.isManager = data.fields.IsManager__c.value
-            if( this.isManager == true){
+        if (data) {
+            this.user = data;
+            if (this.user.IsManager__c == true){
                 this.ShowBtn = true;
-            };
+            }
+
+        } else if (error) {
+
+            this.error = error;
+
         }
     }
 
 
     // Add to cart items
-
     @track selectedProduct;
 
     @wire(getAllProduct) productList;
@@ -228,7 +226,6 @@ export default class orderManagementComponent extends LightningElement {
     }
 
     // List of products in Cart 
-
     @track listInCart = [];
     
     @track columns = [
@@ -239,6 +236,83 @@ export default class orderManagementComponent extends LightningElement {
     ];
 
 
+    // Set button on cart 
+    @track orderName;
+
+    handleChangeOrderName(event) {
+		this.orderName = event.target.value;
+	}
+
+    setCartItems() {
+        setOrderList({listObj: this.listInCart, orderName: this.orderName, accId: this.recordId})
+        .then(result => {
+            console.log('set new order!');
+            console.log(result);
+
+            this.isCartModal = false;
+            
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: this.orderName +' successfully created!',
+                    variant: 'success',
+                }),
+            );
+        })
+    }
+
+
+
+    url;
+
+
+    connectedCallback() {
+        // Store the PageReference in a variable to use in handleClick.
+        // This is a plain Javascript object that conforms to the
+        // PageReference type by including 'type' and 'attributes' properties.
+        // The 'state' property is optional.
+        this.accountHomePageRef = {
+            type: 'standard__objectPage',
+            attributes: {
+                objectApiName: 'Order__c',
+                actionName: 'view'
+            }
+        };
+        this[NavigationMixin.GenerateUrl](this.accountHomePageRef)
+            .then(url => this.url = url);
+    }
+
+    handleClick(evt) {
+        setOrderList({listObj: this.listInCart, orderName: this.orderName, accId: this.recordId})
+        .then(result => {
+            console.log('set new order!');
+            console.log(result);
+
+            this.isCartModal = false;
+            
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Success',
+                    message: 'Order "'+this.orderName+'" successfully created!',
+                    variant: 'success',
+                }),
+            );
+        
+        // Stop the event's default behavior.
+        // Stop the event from bubbling up in the DOM.
+        evt.preventDefault();
+        evt.stopPropagation();
+        // Navigate to the Account Home page.
+        this[NavigationMixin.Navigate](this.accountHomePageRef = {
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: result.Id,
+                objectApiName: 'Order__c',
+                actionName: 'view'
+            }
+        });
+        })
+    }
 
     /*
     @track prodRecord = {

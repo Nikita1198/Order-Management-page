@@ -47,18 +47,26 @@
                                             <!-- Modal/Popup Box LWC body starts here -->
                                         <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                                                 <div class="slds-m-around--xx-large">
-                                                    <div class="container-fluid">
+                                                    <div class="container">
                                                             <lightning-messages></lightning-messages>
-                                                            <div class="slds-grid">
-                                                                <div class="slds-col slds-size_1-of-2">
-                                                                    <lightning-input-field field-name={name}></lightning-input-field>
-                                                                    <lightning-input-field field-name={image}></lightning-input-field>
-                                                                    <lightning-input-field field-name={description}></lightning-input-field>
+                                                            <div class="slds-grid slds-grid_vertical">
+                                                                <div class="slds-col slds-m-bottom_small">
+                                                                    <div class="slds-grid slds-grid_align-spread">
+                                                                        <div class="slds-col">
+                                                                            <lightning-input-field required field-name={name}></lightning-input-field>
+                                                                            <lightning-input-field field-name={family}></lightning-input-field>
+                                                                        </div>
+                                                                        <div class="slds-col">
+                                                                            <lightning-input-field field-name={type}></lightning-input-field>
+                                                                            <lightning-input-field required field-name={price}></lightning-input-field>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="slds-col slds-size_1-of-2">
-                                                                    <lightning-input-field field-name={family}></lightning-input-field>
-                                                                    <lightning-input-field field-name={type}></lightning-input-field>
-                                                                    <lightning-input-field field-name={price}></lightning-input-field>
+                                                                <div class="slds-col">
+                                                                    <lightning-input-field field-name={image}></lightning-input-field>
+                                                                </div>
+                                                                <div class="slds-col">
+                                                                    <lightning-textarea max-length="300" required="true" field-name={description} label="Description"></lightning-textarea>
                                                                 </div>
                                                             </div>
                                                     </div>
@@ -100,6 +108,8 @@
                                             </header>
                                             <!-- Modal/Popup Box LWC body starts here -->
                                             <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                                                <lightning-input class='slds-m-vertical_medium' label="Order Name" type="text" onchange={handleChangeOrderName}>
+                                                </lightning-input>
                                                 <lightning-datatable
                                                         key-field="id"
                                                         data={listInCart}
@@ -107,11 +117,11 @@
                                                         hide-checkbox-column 
                                                         show-row-number-column>
                                                 </lightning-datatable> 
-                                            </div> 
+                                            </div>
                                             <!-- Modal/Popup Box LWC footer starts here -->
                                             <footer class="slds-modal__footer">
                                                 <button class="slds-button slds-button_neutral" onclick={closeCartModal} title="Cancel">Cancel</button>
-                                                <button class="slds-button slds-button_neutral" onclick={closeCartModal} title="Cancel">Set</button>
+                                                <button class="slds-button slds-button_neutral" onclick={handleClick} title="Checkout">Checkout</button>
                                             </footer>
                                     </div>
                                 </section>
