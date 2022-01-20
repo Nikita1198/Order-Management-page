@@ -24,8 +24,8 @@ public with sharing class TestTriggerOrderInsert {
 
         
         Order__c ordertest = [SELECT Id,TotalProductCount__c,TotalPrice__c FROM Order__c WHERE Id = :order.Id ];
-        System.assertEquals(3, ordertest.TotalProductCount__c ,'not equal');
-        System.assertEquals(60, ordertest.TotalPrice__c ,'not equal');
+        System.assertEquals(1, ordertest.TotalProductCount__c ,'not equal');
+        System.assertEquals(10, ordertest.TotalPrice__c ,'not equal');
 
 
     }

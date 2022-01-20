@@ -88,15 +88,15 @@ private class functionsOfOrderApp_Test {
 
         insert lstProd;
 
+        List<Product_c__c> typeList = [SELECT Id, Name, Type__c, Family__c FROM Product_c__c WHERE Type__c = 'Type 1'];
+        List<Product_c__c> familyList = [SELECT Id, Name, Type__c, Family__c FROM Product_c__c WHERE Family__c = 'Family 1'];
+
         try{
             Test.startTest();
-            for(String a : search){
-                for(String b : typeTerm){
-                    for(String c : familyTerm){
-                        System.assertEquals(lstProd,functionsOfOrderApp.searchProduct(a,b,c),'not equal lists');
-                    }
-                }
-            }
+            
+            System.assertEquals(lstProd,functionsOfOrderApp.searchProduct('Test','',''),'not equal lists');
+            System.assertEquals(typeList,functionsOfOrderApp.searchProduct('','Type 1',''),'not equal lists');
+            System.assertEquals(familyList,functionsOfOrderApp.searchProduct('','','Family 1'),'not equal lists');  
             Test.stopTest();
         } catch(Exception ex) {
             throw new AuraHandledException(ex.getMessage());
