@@ -31,31 +31,22 @@ private class functionsOfOrderApp_Test {
 
       
         try{
-            Test.startTest();
             functionsOfOrderApp.setOrderList(products,testOrderName,testAcc.Id);
-            Test.stopTest();
-        } catch(Exception e){
-            
+        } catch(Exception ex) {
+            throw new AuraHandledException(ex.getMessage());
         }
 
-    }
-
-    @isTest static void getAccountDataTest() {
         Account acc = new Account( Name='Test Name' );
         insert acc;
         List<Account> listAcc = new List<Account>();
         listAcc.add(acc);
         System.assertEquals(listAcc, functionsOfOrderApp.getAccountData(acc.Id), 'it is not same account');
-    }
 
-    @isTest static void saveProductRecordTest() {
-        Product_c__c prod = new Product_c__c();
-        System.assertEquals(prod, functionsOfOrderApp.saveProductRecord(prod), 'it is not same product');
-        Product_c__c pro;
-        System.assertEquals(pro, functionsOfOrderApp.saveProductRecord(prod), 'it is not same product');
-    }
 
-    @isTest static void getAllProductTest() {
+        Product_c__c prodT = new Product_c__c();
+        System.assertEquals(prodT, functionsOfOrderApp.saveProductRecord(prodT), 'it is not same product');
+        
+
         List<Product_c__c> listProd = [
             SELECT
                 Id,
@@ -69,20 +60,17 @@ private class functionsOfOrderApp_Test {
             ORDER BY Name
         ];
         System.assertEquals(listProd, functionsOfOrderApp.getAllProduct(), 'It is not same list');
-    }
 
-    @isTest static void getUserDetailsTest() {
         Profile p = [SELECT Id FROM Profile WHERE Name='Standard User']; 
         User u1 = new User(Alias = 'fromUser', Email='standarduser@testorg.com', 
                           EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US', 
                           LocaleSidKey='en_US', ProfileId = p.Id, 
-                          TimeZoneSidKey='America/Los_Angeles', UserName='newuserjoni@testorg.com');
+                          TimeZoneSidKey='America/Los_Angeles', UserName='newuserjoni@testorg.com',
+                          IsManager__c = true);
         insert u1;
-        System.assertEquals(u1, functionsOfOrderApp.getUserDetails(u1.Id), 'It is not same user');
-    }
+        User testUser = [Select Id , Name ,IsManager__c from User where Id = :u1.Id];
+        System.assertEquals(testUser, functionsOfOrderApp.getUserDetails(u1.Id), 'It is not same user');
 
-    @isTest static void searchProductTest() {
-         
         List<String> search = new List<String>();
         List<String> typeTerm = new List<String>();
         List<String> familyTerm = new List<String>();
@@ -109,12 +97,11 @@ private class functionsOfOrderApp_Test {
                     }
                 }
             }
-            
             Test.stopTest();
-        } catch(Exception e){
-            
+        } catch(Exception ex) {
+            throw new AuraHandledException(ex.getMessage());
         }
-
     }
+
 }
 

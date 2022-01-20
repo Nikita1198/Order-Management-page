@@ -1,5 +1,31 @@
 ({
     navigateToLC : function(component, event, helper) {
+
+        /* // Open in Tab on same Page
+        var workspaceAPI = component.find("workspace");
+        workspaceAPI.openTab({
+            pageReference: {
+                "type": "standard__component",
+                "attributes": {
+                    "componentName": 'c__TabComponent',
+                    "actionName":"view"
+                },
+                "state": {
+                    "c__refRecordId": component.get("v.recordId")
+                }
+            },
+            focus: true
+        }).then(function(response) {
+            workspaceAPI.getTabInfo({
+                tabId: response
+        }).then(function(tabInfo) {
+            console.log("The recordId for this tab is: " + tabInfo.recordId);
+        });
+        }).catch(function(error) {
+            console.log(error);
+        });*/
+
+        // Open component in New Browser Tab
         var pageReference = {
             type: 'standard__component',
             attributes: {
